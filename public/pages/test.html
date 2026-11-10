@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>i am coder - Test MCQs</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header>
+    <a href="/" class="logo">&lt;/i am coder&gt;</a>
+    <nav>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/test" class="active">Test MCQs</a>
+    </nav>
+  </header>
+  <div class="container">
+    <div class="card">
+      <h2 style="color: #38bdf8; margin-bottom: 1rem;">Python Programming MCQ Test</h2>
+      <div id="quiz-container">Loading questions from Neon DB...</div>
+    </div>
+  </div>
+  <script>
+    async function fetchQuestions() {
+      try {
+        const res = await fetch('/api/questions');
+        const data = await res.json();
+        if (data.success && data.data.length > 0) {
+          renderQuiz(data.data);
+        } else {
+          document.getElementById('quiz-container').innerHTML = '<p>No questions found in Neon PostgreSQL database. Add questions via CSV from Admin Panel.</p>';
+        }
+      } catch (err) {
+        document.getElementById('quiz-container').innerHTML = '<p style="color: #ef4444;">Error fetching questions from database.</p>';
+      }
+    }
+
+    function renderQuiz(questions) {
+      let html = '';
+      questions.forEach((q, idx) => {
+        const opts = typeof q.options === 'string' ? JSON.parse(q.options) : q.options;
+        html += `
+          <div style="margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid #334155;">
+            <h4>Q${idx + 1}. ${q.question}</h4>
+            ${q.code ? `<pre>${q.code}</pre>` : ''}
+            <div style="margin-top: 0.75rem;">
+              ${opts.map((opt, i) => `
+                <label style="display: block; margin-bottom: 0.4rem; cursor: pointer;">
+                  <input type="radio" name="q_${q.id}" value="${i}"> ${opt}
+                </label>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      });
+      html += '<button class="btn" onclick="alert(\'Test submitted successfully!\')">Submit Test</button>';
+      document.getElementById('quiz-container').innerHTML = html;
+    }
+
+    fetchQuestions();
+  </script>
+</body>
+</html>

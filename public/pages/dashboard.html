@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>i am coder - Student Dashboard</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header>
+    <a href="/" class="logo">&lt;/i am coder&gt;</a>
+    <nav>
+      <a href="/dashboard" class="active">Dashboard</a>
+      <a href="/test">Take Test</a>
+      <a href="/login" onclick="localStorage.clear()">Logout</a>
+    </nav>
+  </header>
+  <div class="container">
+    <div class="card">
+      <h2 style="color: #38bdf8; margin-bottom: 0.5rem;">Student Dashboard</h2>
+      <p style="color: #94a3b8;">Welcome back, Student! Ready to solve programming tests?</p>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+      <div class="card">
+        <h3>Python MCQ Assessment</h3>
+        <p style="color: #94a3b8; margin: 1rem 0;">Test your knowledge on Data Types, Strings, OOP, and Functions.</p>
+        <a href="/test" class="btn">Click to Open Test MCQs</a>
+      </div>
+      <div class="card">
+        <h3>Connected Database</h3>
+        <p style="color: #94a3b8; margin: 1rem 0;">Neon PostgreSQL instance active & ready.</p>
+        <span style="background: #10b98122; color: #34d399; padding: 0.4rem 0.8rem; border-radius: 4px; font-size: 0.9rem;">Status: Connected</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

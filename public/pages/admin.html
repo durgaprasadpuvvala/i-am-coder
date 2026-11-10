@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>i am coder - Admin CSV Question Import</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header>
+    <a href="/" class="logo">&lt;/i am coder&gt;</a>
+    <nav>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/admin" class="active">Admin CSV Upload</a>
+    </nav>
+  </header>
+  <div class="container">
+    <div class="card">
+      <h2 style="color: #38bdf8; margin-bottom: 0.5rem;">Admin Panel - Import Questions via CSV Only</h2>
+      <p style="color: #94a3b8; margin-bottom: 1.5rem;">Upload a .csv file containing questions to automatically populate the database.</p>
+      
+      <form onsubmit="uploadCSV(event)">
+        <div class="upload-box">
+          <label style="display: block; font-size: 1.1rem; color: #38bdf8; margin-bottom: 1rem; cursor: pointer;">
+            📁 Select CSV File to Upload
+            <input type="file" id="csvFileInput" accept=".csv" required style="display: block; margin: 1rem auto 0 auto; width: auto;">
+          </label>
+        </div>
+        <button type="submit" class="btn" style="width: 100%; font-size: 1rem; padding: 0.8rem;">Upload & Save Questions to Database</button>
+      </form>
+
+      <div style="margin-top: 2rem; background: #0f172a; padding: 1rem; border-radius: 6px; border: 1px solid #334155;">
+        <h4 style="color: #38bdf8; margin-bottom: 0.5rem;">CSV Format Standard Header:</h4>
+        <code>section,question,code,option_a,option_b,option_c,option_d,answer,explanation</code>
+        <p style="color: #94a3b8; font-size: 0.85rem; margin-top: 0.5rem;">* Note: <code>answer</code> must be 0 for Option A, 1 for Option B, 2 for Option C, or 3 for Option D.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="color: #38bdf8; margin-bottom: 1rem;">Database Questions List</h3>
+      <div id="questions-table">Loading...</div>
+    </div>
+  </div>
+
+  <script>
+    async function loadQuestions() {
+      const res = await fetch('/api/questions');
+      const data = await res.json();
+      if (data.success) {
+        if (data.data.length === 0) {
+          document.getElementById('questions-table').innerHTML = '<p style="color: #94a3b8;">No questions uploaded yet. Upload a CSV file above.</p>';
+          return;
+        }
+        let html = '<table><thead><tr><th>ID</th><th>Section</th><th>Question</th><th>Action</th></tr></thead><tbody>';
+        data.data.forEach(q => {
+          html += `<tr>
+            <td>${q.id}</td>
+            <td>${q.section}</td>
+            <td>${q.question}</td>
+            <td><button class="btn btn-danger" onclick="deleteQuestion(${q.id})">Delete</button></td>
+          </tr>`;
+        });
+        html += '</tbody></table>';
+        document.getElementById('questions-table').innerHTML = html;
+      }
+    }
+
+    async function uploadCSV(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById('csvFileInput');
+      if (!fileInput.files[0]) return;
+
+      const formData = new FormData();
+      formData.append('csvFile', fileInput.files[0]);
+
+      try {
+        const res = await fetch('/api/questions/upload-csv', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert(data.message);
+          fileInput.value = '';
+          loadQuestions();
+        } else {
+          alert('Upload failed: ' + data.error);
+        }
+      } catch (err) {
+        alert('An error occurred during file upload.');
+      }
+    }
+
+    async function deleteQuestion(id) {
+      if (confirm('Delete this question?')) {
+        await fetch(`/api/questions/${id}`, { method: 'DELETE' });
+        loadQuestions();
+      }
+    }
+
+    loadQuestions();
+  </script>
+</body>
+</html>
